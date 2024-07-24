@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",  
+  "compilerOptions": {
+    "outDir": "../dist/out-tsc",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "types": [
+      "node",
+      "vitest",
+      "vitest/globals",
+      "vitest/importMeta",      
+    ]
+  }
+}
