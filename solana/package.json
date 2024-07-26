@@ -1,5 +1,5 @@
 {
-  "name": "@dvite/program-event-invites",
+  "name": "@eventlink/program-event-invites",
   "type": "module",
   "license": "ISC",
   "dependencies": {

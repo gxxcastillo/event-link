@@ -1,6 +1,6 @@
-# ClanVault
+## Event Link
 
-A secure, user-friendly genealogy platform that leverages blockchain technology to ensure the privacy, integrity, and authenticity of family history data, offering seamless data management and sharing through advanced security features.
+EventLink is a decentralized event management platform designed to securely and seamlessly connect people for gatherings and events. Using blockchain technology, EventLink ensures transparent, efficient, and trustworthy event planning and participation.
 
 ## Running tasks
 
