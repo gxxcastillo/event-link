@@ -76,6 +76,9 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.4.1
         version: 29.7.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      jest-environment-node:
+        specifier: ^29.4.1
+        version: 29.7.0
       jsdom:
         specifier: ~22.1.0
         version: 22.1.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -14157,7 +14160,7 @@ snapshots:
 
   '@types/graceful-fs@4.1.9':
     dependencies:
-      '@types/node': 20.14.11
+      '@types/node': 18.16.9
 
   '@types/http-cache-semantics@4.0.4': {}
 
@@ -17079,7 +17082,7 @@ snapshots:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.14.11
+      '@types/node': 18.16.9
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -17128,7 +17131,7 @@ snapshots:
   jest-mock@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.14.11
+      '@types/node': 18.16.9
       jest-util: 29.7.0
 
   jest-pnp-resolver@1.2.3(jest-resolve@29.7.0):

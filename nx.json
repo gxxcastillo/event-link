@@ -10,7 +10,6 @@
   "namedInputs": {
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "projects": ["apps/*", "libs/*", "solana"],
   "targetDefaults": {
     "@nx/vite:build": {
       "cache": true,
