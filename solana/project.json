@@ -1,8 +1,16 @@
 {
-  "name": "test-event-invites",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "program-event-invites",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "solana",
-  "tags": [],
-  "targets": {}
+  "targets": {
+    "build": {
+      "executor": "@gxxc/nx-anchor:build"
+    },
+
+    "test": {
+      "executor": "@gxxc/nx-anchor:test"
+    }
+  },
+  "tags": []
 }

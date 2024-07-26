@@ -16,7 +16,7 @@ mod event_invite {
     use super::*;
 
     pub fn create_event(
-        ctx: Context<CreateEvent>,
+        ctx: Context<CreateEventAccounts>,
         title: String,
         description: String,
         date: String,
@@ -26,7 +26,7 @@ mod event_invite {
         instructions::create_event(ctx, title, description, date, max_invites, metadata_uri)
     }
 
-    pub fn rsvp(ctx: Context<RSVP>, response: RsvpResponse) -> Result<()> {
-        instructions::rsvp(ctx, response)
+    pub fn rsvp(ctx: Context<RsvpAccounts>, status: RsvpStatus) -> Result<()> {
+        instructions::rsvp(ctx, status)
     }
 }

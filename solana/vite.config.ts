@@ -1,8 +1,11 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  cacheDir: './node_modules/.vitest',
   test: {
-    include: ['tests/**/*.ts'],
-    watch: false
+    watch: false,
+    globals: false,
+    environment: 'node',
+    include: ['tests/**/*test.ts'],
   },
 });

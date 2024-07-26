@@ -11,16 +11,17 @@ pub struct Event {
     pub metadata_uri: String,
     pub max_attendees: u32,
     pub num_attendees: u32,
-    pub fee_payer: Pubkey,
 }
 
 #[account]
-pub struct Attendee {
-    pub response: RsvpResponse,
+pub struct RSVP {
+    pub event: Pubkey,
+    pub attendee: Pubkey,
+    pub status: Option<RsvpStatus>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq)]
-pub enum RsvpResponse {
+pub enum RsvpStatus {
     Accepted,
     Rejected,
     Tentative,

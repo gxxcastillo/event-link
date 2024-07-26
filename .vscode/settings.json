@@ -1,13 +1,16 @@
 {
   "cSpell.words": [
     "blockhash",
+    "devkit",
     "dvite",
     "Keypair",
     "localnet",
     "Pubkey",
     "rsvped",
+    "Rsvps",
     "solidjs",
     "vinxi",
     "vitest"
-  ]
+  ],
+  "eslint.validate": ["json"]
 }

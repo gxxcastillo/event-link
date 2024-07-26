@@ -1,18 +1,16 @@
 {
-  "name": "@dvite/test-event-invites",
+  "name": "@dvite/program-event-invites",
   "type": "module",
   "license": "ISC",
-  "scripts": {
-    "test": "vitest",
-    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
-  },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.30.1"
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@gxxc/nx-anchor": "^0.0.8",
     "@types/bn.js": "^5.1.0",
-    "typescript": "^4.9.5",
+    "typescript": "^5.5.4",
     "vitest": "^2.0.4"
   }
 }
