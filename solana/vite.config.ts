@@ -6,6 +6,11 @@ export default defineConfig({
     watch: false,
     globals: false,
     environment: 'node',
+    sequence: {
+      // Ensure tests run sequentially
+      shuffle: false,
+      concurrent: false,
+    },
     include: ['tests/**/*test.ts'],
   },
 });

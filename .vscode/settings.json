@@ -1,14 +1,17 @@
 {
   "cSpell.words": [
     "blockhash",
+    "Borsh",
     "devkit",
     "eventlink",
     "Keypair",
     "localnet",
     "Pubkey",
+    "pubkeys",
     "rsvped",
     "Rsvps",
     "solidjs",
+    "Sysvar",
     "vinxi",
     "vitest"
   ],
