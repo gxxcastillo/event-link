@@ -4,14 +4,18 @@ use anchor_spl::associated_token::AssociatedToken;
 
 use crate::state::{ Event, RSVP, Invite, EventInfo };
 
+
 #[derive(Accounts)]
+#[instruction(id: [u8; 9])]
 pub struct CreateEventAccounts<'info> {
     #[account(
         init, 
-        payer = creator, 
-        space = 8 + Event::INIT_SPACE
+        payer = creator,
+        space = 8 + Event::INIT_SPACE,
+        seeds = [b"event", id.as_ref()],
+        bump
     )]
-    pub event: Account<'info, Event>,
+    pub event: Box<Account<'info, Event>>,
     #[account(
         init,
         payer = creator, 

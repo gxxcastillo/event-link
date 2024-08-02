@@ -245,9 +245,9 @@ describe('event_invites', () => {
       });
 
       const { inviteKeys } = await createInvites({ eventPK: eventPubkeys.event, creatorKP, numInvites: 5 });
+      const id = inviteKeys[0].id;
       const invitePK = inviteKeys[0].pubkey;
       const bump = inviteKeys[0].bump;
-      const id = inviteKeys[0].id;
 
       const { attendeeKP, pubkeys: rsvpPubkeys } = await rsvpToEvent({
         eventPK: eventPubkeys.event,

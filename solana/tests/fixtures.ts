@@ -1,9 +1,10 @@
 import { web3, workspace, Program, IdlTypes, Provider } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { ConfirmOptions, Connection, SendTransactionError } from '@solana/web3.js';
+import { ConfirmOptions, Connection, SendTransactionError, Keypair, PublicKey } from '@solana/web3.js';
 import { faker } from '@faker-js/faker';
-
 import BN from 'bn.js';
+import { nanoid } from 'nanoid';
+
 import { EventInvite } from '../target/types/event_invite.js';
 
 export type EventInfo = IdlTypes<EventInvite>['eventInfo'];
@@ -30,12 +31,36 @@ export type IRsvpToEvent = {
   rsvpStatus: RsvpStatusKey;
   authorityPK: web3.PublicKey;
   invitePK?: web3.PublicKey;
-  inviteID?: number;
+  inviteID?: string;
   inviteBump?: number;
   mintPK: web3.PublicKey;
 };
 
-const { Keypair, PublicKey } = web3;
+export const eventProgram = workspace.EventInvite as Program<EventInvite>;
+await augmentProvider(eventProgram.provider);
+
+const sol = 1000000000;
+const txCost = 5108640;
+const authorityFunds = sol + txCost;
+const creatorFunds = 5 * sol + authorityFunds;
+const attendeeFunds = creatorFunds;
+
+const confirmOptions: ConfirmOptions = { commitment: 'confirmed', maxRetries: 10 };
+
+function padByteArray(uint8Array: Uint8Array, size: number) {
+  const paddedArray = new Uint8Array(size);
+  paddedArray.set(uint8Array);
+  return paddedArray;
+}
+
+function stringToByteArray(id: string, size: number = id.length) {
+  const uint8array = new TextEncoder().encode(id).slice(0, size);
+  return uint8array.length < size ? padByteArray(uint8array, size) : uint8array;
+}
+
+function stringToNumberArray(id: string, size: number = id.length) {
+  return Array.from(stringToByteArray(id, size));
+}
 
 // Overrides the default sendAndConfirm to allow for forcing a fresh blockhash
 async function augmentProvider(provider: Provider) {
@@ -63,17 +88,6 @@ async function augmentProvider(provider: Provider) {
   return provider;
 }
 
-export const eventProgram = workspace.EventInvite as Program<EventInvite>;
-await augmentProvider(eventProgram.provider);
-
-const sol = 1000000000;
-const txCost = 5108640;
-const authorityFunds = sol + txCost;
-const creatorFunds = 5 * sol + authorityFunds;
-const attendeeFunds = creatorFunds;
-
-const confirmOptions: ConfirmOptions = { commitment: 'confirmed', maxRetries: 10 };
-
 function isFulfilled<T>(
   result: PromiseFulfilledResult<T> | PromiseRejectedResult
 ): result is { status: 'fulfilled'; value: T } {
@@ -98,9 +112,7 @@ export async function createNewEvent({
 }: ICreateNewEvent = {}) {
   await fundAccount(eventProgram.provider.connection, creatorKP.publicKey, creatorFunds);
 
-  const eventKP = web3.Keypair.generate();
   const accounts = {
-    event: eventKP.publicKey,
     creator: creatorKP.publicKey,
     tokenProgram: TOKEN_PROGRAM_ID,
     systemProgram: web3.SystemProgram.programId,
@@ -112,10 +124,14 @@ export async function createNewEvent({
   const metadataUri = faker.internet.url();
   const inviteOnly = isInviteOnly;
   const args = {
+    id: nanoid(9),
     metadata: {
       title,
       date,
       metadataUri,
+      status: {
+        published: {},
+      },
     },
     settings: {
       isInviteOnly: inviteOnly,
@@ -126,9 +142,9 @@ export async function createNewEvent({
   } as const;
 
   const { pubkeys } = await eventProgram.methods
-    .createEvent(args.metadata, args.settings, args.initialFunds)
+    .createEvent(stringToNumberArray(args.id, 9), args.metadata, args.settings, args.initialFunds)
     .accounts(accounts)
-    .signers([eventKP, creatorKP])
+    .signers([creatorKP])
     .rpcAndKeys(confirmOptions);
 
   return {
@@ -148,17 +164,25 @@ export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateI
     rent: web3.SYSVAR_RENT_PUBKEY,
   };
 
-  const remainingAccountTuples = Array.from({ length: numInvites }, (_, index) => {
-    const indexBuffer = Buffer.alloc(4);
-    indexBuffer.writeUInt32LE(index);
-    return PublicKey.findProgramAddressSync(
-      [Buffer.from('invite'), eventPK.toBuffer(), indexBuffer],
+  const remainingAccountTuples = Array.from({ length: numInvites }, () => {
+    const id = nanoid(6);
+    const [pubkey, bump] = PublicKey.findProgramAddressSync(
+      [Buffer.from('invite'), eventPK.toBuffer(), stringToByteArray(id, 6)],
       eventProgram.programId
     );
+
+    return {
+      id,
+      pubkey,
+      bump,
+    };
   });
 
-  const remainingAccountKeys = remainingAccountTuples.map(([, bump], index) => ({ id: index, bump }));
-  const remainingAccounts = remainingAccountTuples.map(([pubkey]) => {
+  const remainingAccountKeys = remainingAccountTuples.map(({ id, bump }) => {
+    return { id: stringToNumberArray(id), bump };
+  });
+
+  const remainingAccounts = remainingAccountTuples.map(({ pubkey }) => {
     return {
       pubkey,
       isSigner: false,
@@ -176,7 +200,7 @@ export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateI
   console.info(`Successfully created event: ${eventPK}`);
 
   return {
-    inviteKeys: remainingAccountTuples.map(([pubkey, bump], index) => ({ pubkey, bump, id: index })),
+    inviteKeys: remainingAccountTuples,
     ...pubkeys,
   };
 }
@@ -217,8 +241,9 @@ export async function rsvpToEvent({
     rent: web3.SYSVAR_RENT_PUBKEY,
   };
 
+  const numberArray = inviteID ? stringToNumberArray(inviteID) : null;
   const { pubkeys } = await eventProgram.methods
-    .rsvp(args.rsvpEnum, args.inviteID, args.inviteBump)
+    .rsvp(args.rsvpEnum, numberArray, args.inviteBump)
     .accounts(rsvpAccounts)
     .signers([attendeeKP])
     .rpcAndKeys(confirmOptions);

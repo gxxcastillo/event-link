@@ -13,12 +13,13 @@ use crate::EventSettings;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InviteKeys {
-    id: u32,
+    id: [u8; 6],
     bump: u8,
 }
 
 pub fn create_event(
     ctx: Context<CreateEventAccounts>,
+    id: [u8; 9],
     metadata: EventMetadata,
     settings: EventSettings,
     initial_funds: u64,
@@ -31,6 +32,7 @@ pub fn create_event(
     event.info_bump = ctx.bumps.info;
     event.mint_authority_bump = ctx.bumps.mint_authority;
     event.mint_bump = ctx.bumps.mint;
+    event.id = id;
     event.num_invites = 0;
     event.num_rsvps = 0;
     
@@ -70,7 +72,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
     require!(keys.len() == num_invites, ErrorCode::MismatchedInviteData);
 
     for (index, invite_keys) in keys.iter().enumerate() {
-        let id = invite_keys.id.to_le_bytes();
+        let id = invite_keys.id;
         let bump = [invite_keys.bump];
         let seeds: &[&[u8]] = &[b"invite", event_pk.as_ref(), &id, &bump];
 
@@ -97,6 +99,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
         info[..8].copy_from_slice(&discriminator);
 
         let invite = Invite {
+            id,
             event: event_pk,
             rsvp: None,
         };
@@ -112,7 +115,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
 pub fn rsvp(
     ctx: Context<RsvpAccounts>,
     status: RsvpStatus,
-    invite_id: Option<u32>,
+    invite_id: Option<[u8; 6]>,
     invite_bump: Option<u8>,
 ) -> Result<()> {
     let rsvp = &mut ctx.accounts.rsvp;
@@ -127,15 +130,9 @@ pub fn rsvp(
     if info.settings.is_invite_only {
         require!(invite_id != None && invite_bump != None, ErrorCode::InviteRequired);
 
-        let invite_pk = Pubkey::create_program_address(
-            &[
-                b"invite",
-                event.key().as_ref(),
-                &invite_id.unwrap().to_le_bytes(),
-                &invite_bump.unwrap().to_le_bytes(),
-            ],
-            ctx.program_id
-        ).map_err(|_| ProgramError::InvalidAccountData)?;
+        let event_pk = event.key();
+        let seeds: &[&[u8]] = &[b"invite", event_pk.as_ref(), &invite_id.unwrap(), &invite_bump.unwrap().to_le_bytes()];
+        let invite_pk = Pubkey::create_program_address(seeds, ctx.program_id).map_err(|_| ProgramError::InvalidAccountData)?;
 
         if let Some(invite) = &mut ctx.accounts.invite {
             require!(invite.key() == invite_pk, ErrorCode::NoInviteFound);

@@ -10,6 +10,7 @@ pub struct Event {
     pub info_bump: u8,
     pub mint_authority_bump: u8,
     pub mint_bump: u8,
+    pub id: [u8; 9],
     pub num_invites: u32,
     pub num_rsvps: u32,
 }
@@ -31,6 +32,7 @@ pub struct EventMetadata {
     pub date: i64,
     #[max_len(120)]
     pub metadata_uri: String,
+    pub status: EventStatus
 }
 
 #[account]
@@ -44,6 +46,7 @@ pub struct EventSettings {
 #[account]
 #[derive(InitSpace)]
 pub struct Invite {
+    pub id: [u8; 6],
     pub event: Pubkey,
     pub rsvp: Option<Pubkey>,
 }
@@ -66,3 +69,11 @@ pub enum RsvpStatus {
     Rejected,
     Tentative,
 }
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+#[derive(InitSpace)]
+pub enum EventStatus {
+    Draft,
+    Published,
+}
+
