@@ -65,7 +65,7 @@ describe('event_invites', () => {
         expect(invite).to.have.property('event');
         expect(invite?.event.toString()).to.equal(eventPK.toString());
 
-        expect(invite).to.have.property('rsvp').that.is.null;
+        expect(invite).to.have.property('rsvp').to.equal(null);
       });
     });
   });

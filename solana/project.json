@@ -8,6 +8,10 @@
       "executor": "@gxxc/nx-anchor:build"
     },
 
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+
     "test": {
       "executor": "@gxxc/nx-anchor:test"
     }

@@ -1,0 +1,456 @@
+{
+  "address": "HvdMiRfuZs9M5KC5LcWpAQnetxHqKdyjqGVFvGvRm3WY",
+  "metadata": {
+    "name": "event_invite",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "create_event",
+      "discriminator": [49, 219, 29, 203, 22, 98, 100, 87],
+      "accounts": [
+        {
+          "name": "event",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 117, 116, 104, 111, 114, 105, 116, 121]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "event_date",
+          "type": "i64"
+        },
+        {
+          "name": "max_attendees",
+          "type": "u32"
+        },
+        {
+          "name": "metadata_uri",
+          "type": "string"
+        },
+        {
+          "name": "is_invite_only",
+          "type": "bool"
+        },
+        {
+          "name": "initial_funds",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "create_invites",
+      "discriminator": [229, 62, 131, 131, 163, 149, 41, 183],
+      "accounts": [
+        {
+          "name": "event",
+          "writable": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true,
+          "relations": ["event"]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "keys",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "InviteKeys"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "rsvp",
+      "discriminator": [134, 164, 221, 33, 183, 12, 73, 32],
+      "accounts": [
+        {
+          "name": "event",
+          "writable": true
+        },
+        {
+          "name": "rsvp",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [114, 115, 118, 112]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              },
+              {
+                "kind": "account",
+                "path": "attendee"
+              }
+            ]
+          }
+        },
+        {
+          "name": "invite",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "attendee",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 117, 116, 104, 111, 114, 105, 116, 121]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [109, 105, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "event"
+              }
+            ]
+          }
+        },
+        {
+          "name": "attendee_token_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "attendee"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28, 180, 133,
+                  237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19, 153, 218,
+                255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": {
+            "defined": {
+              "name": "RsvpStatus"
+            }
+          }
+        },
+        {
+          "name": "invite_id",
+          "type": {
+            "option": "u32"
+          }
+        },
+        {
+          "name": "invite_bump",
+          "type": {
+            "option": "u8"
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Event",
+      "discriminator": [125, 192, 125, 158, 9, 115, 152, 233]
+    },
+    {
+      "name": "Invite",
+      "discriminator": [230, 17, 253, 74, 50, 78, 85, 101]
+    },
+    {
+      "name": "RSVP",
+      "discriminator": [255, 91, 20, 106, 97, 136, 70, 46]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InviteRequired",
+      "msg": "An invite is required for this event."
+    },
+    {
+      "code": 6001,
+      "name": "NoInviteFound",
+      "msg": "Invite not found."
+    },
+    {
+      "code": 6002,
+      "name": "InviteAlreadyExists",
+      "msg": "Invite account already exists."
+    },
+    {
+      "code": 6003,
+      "name": "ConversionError",
+      "msg": "Unable to convert data type."
+    },
+    {
+      "code": 6004,
+      "name": "MismatchedInviteData",
+      "msg": "Mismatched invite IDs and PDA public keys."
+    },
+    {
+      "code": 6005,
+      "name": "PdaMismatch",
+      "msg": "PDA mismatch."
+    },
+    {
+      "code": 6006,
+      "name": "MaxRsvpsReached",
+      "msg": "The maximum number of attendees have accepted."
+    }
+  ],
+  "types": [
+    {
+      "name": "Event",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "date_created",
+            "type": "i64"
+          },
+          {
+            "name": "date_updated",
+            "type": "i64"
+          },
+          {
+            "name": "event_date",
+            "type": "i64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "authority_bump",
+            "type": "u8"
+          },
+          {
+            "name": "token_mint_bump",
+            "type": "u8"
+          },
+          {
+            "name": "metadata_uri",
+            "type": "string"
+          },
+          {
+            "name": "is_invite_only",
+            "type": "bool"
+          },
+          {
+            "name": "max_attendees",
+            "type": "u32"
+          },
+          {
+            "name": "num_invites",
+            "type": "u32"
+          },
+          {
+            "name": "num_rsvps",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Invite",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "rsvp",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "InviteKeys",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u32"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RSVP",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "event",
+            "type": "pubkey"
+          },
+          {
+            "name": "attendee",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "RsvpStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RsvpStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Accepted"
+          },
+          {
+            "name": "Rejected"
+          },
+          {
+            "name": "Tentative"
+          }
+        ]
+      }
+    }
+  ]
+}

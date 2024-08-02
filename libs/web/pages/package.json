@@ -1,0 +1,16 @@
+{
+  "name": "@eventlink/web-pages",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "typings": "./index.d.ts",
+  "dependencies": {
+    "solid-js": "^1.8.19"
+  },
+  "devDependencies": {
+    "vite": "^5.3.5",
+    "vite-plugin-solid": "^2.10.2",
+    "vitest": "^2.0.5"
+  }
+}

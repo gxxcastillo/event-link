@@ -228,7 +228,7 @@ export async function manyRsvpsToEvent({
       // Not sure if this is needed but adding a bit of a delay to see if it avoids collisions
       await new Promise((r) => setTimeout(r, 100));
       count++;
-    } catch (error) {
+    } catch {
       /** noop */
     }
   }
