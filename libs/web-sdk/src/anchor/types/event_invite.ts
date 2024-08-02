@@ -44,7 +44,7 @@ export type EventInvite = {
           };
         },
         {
-          name: 'tokenMint';
+          name: 'mint';
           writable: true;
           pda: {
             seeds: [
@@ -186,7 +186,7 @@ export type EventInvite = {
           };
         },
         {
-          name: 'tokenMint';
+          name: 'mint';
           writable: true;
           pda: {
             seeds: [
@@ -249,7 +249,7 @@ export type EventInvite = {
               },
               {
                 kind: 'account';
-                path: 'tokenMint';
+                path: 'mint';
               }
             ];
             program: {
@@ -414,7 +414,7 @@ export type EventInvite = {
             type: 'u8';
           },
           {
-            name: 'tokenMintBump';
+            name: 'mintBump';
             type: 'u8';
           },
           {

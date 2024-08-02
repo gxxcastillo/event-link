@@ -7,8 +7,9 @@ use anchor_lang::solana_program::program::invoke;
 use anchor_spl::token::{ self, MintTo };
 
 use crate::context::{ CreateEventAccounts, CreateInvitesAccounts, RsvpAccounts };
-use crate::state::{ RsvpStatus, Invite };
+use crate::state::{ RsvpStatus, Invite, EventMetadata };
 use crate::error::ErrorCode;
+use crate::EventSettings;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InviteKeys {
@@ -18,32 +19,32 @@ pub struct InviteKeys {
 
 pub fn create_event(
     ctx: Context<CreateEventAccounts>,
-    event_date: i64,
-    max_attendees: u32,
-    metadata_uri: String,
-    is_invite_only: bool,
-    initial_funds: u64
+    metadata: EventMetadata,
+    settings: EventSettings,
+    initial_funds: u64,
 ) -> ProgramResult {
     let event = &mut ctx.accounts.event;
     event.date_created = Clock::get()?.unix_timestamp;
     event.date_updated = event.date_created;
-    event.event_date = event_date;
     event.creator = ctx.accounts.creator.key();
     event.authority = event.creator;
-    event.authority_bump = ctx.bumps.authority;
-    event.token_mint_bump = ctx.bumps.token_mint;
-    event.metadata_uri = metadata_uri;
-    event.max_attendees = max_attendees;
-    // event.foof = false;
+    event.info_bump = ctx.bumps.info;
+    event.mint_authority_bump = ctx.bumps.mint_authority;
+    event.mint_bump = ctx.bumps.mint;
     event.num_invites = 0;
     event.num_rsvps = 0;
-    event.is_invite_only = is_invite_only;
+    
+    let info = &mut ctx.accounts.info;
+    info.date_updated = event.date_created;
+    info.authority = event.authority;
+    info.metadata = metadata;
+    info.settings = settings;
 
     invoke(
-        &transfer(&ctx.accounts.creator.key(), &ctx.accounts.authority.key(), initial_funds),
+        &transfer(&ctx.accounts.creator.key(), &ctx.accounts.mint_authority.key(), initial_funds),
         &[
             ctx.accounts.creator.to_account_info(),
-            ctx.accounts.authority.to_account_info(),
+            ctx.accounts.mint_authority.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
         ]
     )?;
@@ -59,10 +60,11 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
     let creator = &ctx.accounts.creator;
     let system_program = &ctx.accounts.system_program;
 
-    let space = 32 + 32 + 8 + 1;
+    let space = 8 + Invite::INIT_SPACE;
     let lamports = Rent::get()?.minimum_balance(space);
     let discriminator = Invite::discriminator();
 
+    let event_pk = event.key();
     let invite_accounts = &ctx.remaining_accounts;
     let num_invites = invite_accounts.len();
     require!(keys.len() == num_invites, ErrorCode::MismatchedInviteData);
@@ -70,7 +72,6 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
     for (index, invite_keys) in keys.iter().enumerate() {
         let id = invite_keys.id.to_le_bytes();
         let bump = [invite_keys.bump];
-        let event_pk = event.key();
         let seeds: &[&[u8]] = &[b"invite", event_pk.as_ref(), &id, &bump];
 
         let invite_info = &invite_accounts[index];
@@ -78,7 +79,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
         require!(invite_info.key() == pda, ErrorCode::PdaMismatch);
         require!(invite_info.lamports() == 0, ErrorCode::InviteAlreadyExists);
 
-        let create_account_ix = create_account(
+        let create_invite_ix = create_account(
             &creator.key(),
             &invite_info.key(),
             lamports,
@@ -87,7 +88,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
         );
 
         invoke_signed(
-            &create_account_ix,
+            &create_invite_ix,
             &[creator.to_account_info(), invite_info.to_account_info(), system_program.to_account_info()],
             &[seeds]
         )?;
@@ -112,17 +113,18 @@ pub fn rsvp(
     ctx: Context<RsvpAccounts>,
     status: RsvpStatus,
     invite_id: Option<u32>,
-    invite_bump: Option<u8>
+    invite_bump: Option<u8>,
 ) -> Result<()> {
-    let event: &mut Account<crate::Event> = &mut ctx.accounts.event;
-    let rsvp: &mut Account<crate::RSVP> = &mut ctx.accounts.rsvp;
-    let prev_status: RsvpStatus = rsvp.status.clone();
+    let rsvp = &mut ctx.accounts.rsvp;
+    let prev_status = rsvp.status.clone();
 
     if status == prev_status {
         return Ok(());
     }
 
-    if event.is_invite_only {
+    let event = &mut ctx.accounts.event;
+    let info = &mut ctx.accounts.info;
+    if info.settings.is_invite_only {
         require!(invite_id != None && invite_bump != None, ErrorCode::InviteRequired);
 
         let invite_pk = Pubkey::create_program_address(
@@ -147,20 +149,20 @@ pub fn rsvp(
     if prev_status == RsvpStatus::Accepted && event.num_rsvps > 0 {
         event.num_rsvps -= 1;
     } else if status == RsvpStatus::Accepted {
-        if event.max_attendees > 0 {
-            require!(event.max_attendees > event.num_rsvps, ErrorCode::MaxRsvpsReached);
+        if info.settings.max_attendees > 0 {
+            require!(info.settings.max_attendees > event.num_rsvps, ErrorCode::MaxRsvpsReached);
         }
 
         let cpi_accounts = MintTo {
-            mint: ctx.accounts.token_mint.to_account_info(),
+            mint: ctx.accounts.mint.to_account_info(),
             to: ctx.accounts.attendee_token_account.to_account_info(),
             authority: ctx.accounts.authority.to_account_info(),
         };
 
         let cpi_program = ctx.accounts.token_program.to_account_info();
-        let authority_bump = event.authority_bump;
+        let mint_authority_bump = event.mint_authority_bump;
         let event_key = event.key();
-        let seeds = &[b"authority", event_key.as_ref(), &[authority_bump]];
+        let seeds = &[b"mint_authority", event_key.as_ref(), &[mint_authority_bump]];
         let signer_seeds = &[&seeds[..]];
         let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
         token::mint_to(cpi_context, 1)?;

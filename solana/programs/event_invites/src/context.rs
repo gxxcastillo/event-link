@@ -2,12 +2,24 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{ Mint, TokenAccount, Token };
 use anchor_spl::associated_token::AssociatedToken;
 
-use crate::state::{ Event, RSVP, Invite };
+use crate::state::{ Event, RSVP, Invite, EventInfo };
 
 #[derive(Accounts)]
 pub struct CreateEventAccounts<'info> {
-    #[account(init, payer = creator, space = 8 + 8 + 8 + 32 + 32 + 1 + 1 + 256 + 1 + 4 + 4 + 4)]
+    #[account(
+        init, 
+        payer = creator, 
+        space = 8 + Event::INIT_SPACE
+    )]
     pub event: Account<'info, Event>,
+    #[account(
+        init,
+        payer = creator, 
+        space = 8 + EventInfo::INIT_SPACE,
+        seeds = [b"info", event.key().as_ref()],
+        bump
+    )]
+    pub info: Box<Account<'info, EventInfo>>,
     #[account(mut, signer)]
     pub creator: Signer<'info>,
     /// CHECK: TODO
@@ -16,20 +28,20 @@ pub struct CreateEventAccounts<'info> {
         owner = system_program.key(),
         payer = creator,
         space = 8,
-        seeds = [b"authority", event.key().as_ref()],
+        seeds = [b"mint_authority", event.key().as_ref()],
         bump
     )]
-    pub authority: UncheckedAccount<'info>,
+    pub mint_authority: UncheckedAccount<'info>,
     #[account(
         init,
         payer = creator,
         mint::decimals = 1,
-        mint::authority = authority.key(),
-        mint::freeze_authority = authority.key(),
+        mint::authority = mint_authority.key(),
+        mint::freeze_authority = mint_authority.key(),
         seeds = [b"mint", event.key().as_ref()],
         bump
     )]
-    pub token_mint: Account<'info, Mint>,
+    pub mint: Account<'info, Mint>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -54,9 +66,14 @@ pub struct RsvpAccounts<'info> {
     #[account(mut)]
     pub event: Account<'info, Event>,
     #[account(
+        seeds = [b"info", event.key().as_ref()],
+        bump = event.info_bump
+    )]
+    pub info: Account<'info, EventInfo>,
+    #[account(
         init_if_needed,
         payer = attendee,
-        space = 8 + 32 + 32 + 1 + 1,
+        space = 8 + EventInfo::INIT_SPACE,
         seeds = [b"rsvp", event.key().as_ref(), attendee.key().as_ref()],
         bump
     )]
@@ -68,22 +85,22 @@ pub struct RsvpAccounts<'info> {
     /// CHECK: TODO
     #[account(
         mut,
-        seeds = [b"authority", event.key().as_ref()],
-        bump = event.authority_bump
+        seeds = [b"mint_authority", event.key().as_ref()],
+        bump = event.mint_authority_bump
     )]
     pub authority: UncheckedAccount<'info>,
     #[account(
         mut,
         seeds = [b"mint", event.key().as_ref()],
-        bump = event.token_mint_bump
+        bump = event.mint_bump
     )]
-    pub token_mint: Account<'info, Mint>,
+    pub mint: Account<'info, Mint>,
     #[account(
         init_if_needed,
         payer = attendee,
-        associated_token::mint = token_mint,
+        associated_token::mint = mint,
         associated_token::authority = attendee,
-        constraint = attendee_token_account.mint == token_mint.key()
+        constraint = attendee_token_account.mint == mint.key()
     )]
     pub attendee_token_account: Account<'info, TokenAccount>,
     pub associated_token_program: Program<'info, AssociatedToken>,

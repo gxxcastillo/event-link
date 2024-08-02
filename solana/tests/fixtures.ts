@@ -1,46 +1,70 @@
-import { web3, workspace, Program } from '@coral-xyz/anchor';
+import { web3, workspace, Program, IdlTypes, Provider } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { ConfirmOptions, Connection } from '@solana/web3.js';
+import { ConfirmOptions, Connection, SendTransactionError } from '@solana/web3.js';
 import { faker } from '@faker-js/faker';
 
 import BN from 'bn.js';
 import { EventInvite } from '../target/types/event_invite.js';
 
-type RsvpStatusArg =
-  | Record<'accepted', Record<string, never>>
-  | Record<'rejected', Record<string, never>>
-  | Record<'tentative', Record<string, never>>;
-type RsvpStatus = `${RsvpEnum}`;
-enum RsvpEnum {
-  Accepted = 'accepted',
-  Rejected = 'rejected',
-  Tentative = 'tentative',
-}
+export type EventInfo = IdlTypes<EventInvite>['eventInfo'];
+export type RsvpStatus = IdlTypes<EventInvite>['rsvpStatus'];
+export type RsvpStatusKey = keyof RsvpStatus;
 
-type ICreateNewEvent = {
+export type ICreateNewEvent = {
   creatorKP?: web3.Keypair;
   maxAttendees?: number;
   isInviteOnly?: boolean;
+  showGuestList?: boolean;
 };
 
-type ICreateInvites = {
+export type ICreateInvites = {
   eventPK: web3.PublicKey;
   creatorKP: web3.Keypair;
   numInvites: number;
 };
 
-type IRsvpToEvent = {
+export type IRsvpToEvent = {
   eventPK: web3.PublicKey;
+  infoPK: web3.PublicKey;
   attendeeKP?: web3.Keypair;
-  rsvpStatus: RsvpStatus;
+  rsvpStatus: RsvpStatusKey;
   authorityPK: web3.PublicKey;
   invitePK?: web3.PublicKey;
   inviteID?: number;
   inviteBump?: number;
-  tokenMintPK: web3.PublicKey;
+  mintPK: web3.PublicKey;
 };
 
 const { Keypair, PublicKey } = web3;
+
+// Overrides the default sendAndConfirm to allow for forcing a fresh blockhash
+async function augmentProvider(provider: Provider) {
+  const originalSendAndConfirm = provider.sendAndConfirm?.bind(provider);
+
+  provider.sendAndConfirm = async (originalTx, signers, opts) => {
+    try {
+      return await originalSendAndConfirm(originalTx, signers, opts);
+    } catch (error) {
+      if (error instanceof SendTransactionError && error.message.toLowerCase().includes('blockhash')) {
+        const latestBlockHash = await provider.connection.getLatestBlockhash();
+        const tx = Object.assign(originalTx, {
+          recentBlockhash: latestBlockHash.blockhash,
+          lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        });
+
+        // lets try that once more...
+        return await originalSendAndConfirm(tx, signers, opts);
+      }
+
+      throw error;
+    }
+  };
+
+  return provider;
+}
+
+export const eventProgram = workspace.EventInvite as Program<EventInvite>;
+await augmentProvider(eventProgram.provider);
 
 const sol = 1000000000;
 const txCost = 5108640;
@@ -49,6 +73,12 @@ const creatorFunds = 5 * sol + authorityFunds;
 const attendeeFunds = creatorFunds;
 
 const confirmOptions: ConfirmOptions = { commitment: 'confirmed', maxRetries: 10 };
+
+function isFulfilled<T>(
+  result: PromiseFulfilledResult<T> | PromiseRejectedResult
+): result is { status: 'fulfilled'; value: T } {
+  return result.status === 'fulfilled';
+}
 
 async function fundAccount(connection: Connection, publicKey: web3.PublicKey, amount: number) {
   const latestBlockHash = await connection.getLatestBlockhash();
@@ -64,10 +94,9 @@ export async function createNewEvent({
   creatorKP = Keypair.generate(),
   maxAttendees = faker.number.int({ max: 50 }),
   isInviteOnly = false,
+  showGuestList = true,
 }: ICreateNewEvent = {}) {
-  const program = workspace.EventInvite as Program<EventInvite>;
-
-  await fundAccount(program.provider.connection, creatorKP.publicKey, creatorFunds);
+  await fundAccount(eventProgram.provider.connection, creatorKP.publicKey, creatorFunds);
 
   const eventKP = web3.Keypair.generate();
   const accounts = {
@@ -78,48 +107,39 @@ export async function createNewEvent({
     rent: web3.SYSVAR_RENT_PUBKEY,
   };
 
-  const eventDate = new BN(faker.date.soon().valueOf());
-  const eventMaxAttendees = maxAttendees;
-  const eventMetadataUri = faker.internet.url();
+  const title = faker.lorem.words({ min: 2, max: 4 });
+  const date = new BN(faker.date.soon().valueOf());
+  const metadataUri = faker.internet.url();
   const inviteOnly = isInviteOnly;
   const args = {
-    eventDate,
-    eventMaxAttendees,
-    eventMetadataUri,
-    isInviteOnly: inviteOnly,
-    initialFunds: authorityFunds,
+    metadata: {
+      title,
+      date,
+      metadataUri,
+    },
+    settings: {
+      isInviteOnly: inviteOnly,
+      maxAttendees,
+      showGuestList,
+    },
+    initialFunds: new BN(authorityFunds),
   } as const;
 
-  const { pubkeys } = await program.methods
-    .createEvent(
-      args.eventDate,
-      args.eventMaxAttendees,
-      args.eventMetadataUri,
-      args.isInviteOnly,
-      new BN(args.initialFunds)
-    )
+  const { pubkeys } = await eventProgram.methods
+    .createEvent(args.metadata, args.settings, args.initialFunds)
     .accounts(accounts)
     .signers([eventKP, creatorKP])
     .rpcAndKeys(confirmOptions);
 
-  const tokenMintPK = pubkeys.tokenMint;
-  const authorityPK = pubkeys.authority;
-  const eventPK = pubkeys.event;
-
   return {
-    program,
-    eventPK,
     creatorKP,
-    tokenMintPK,
-    authorityPK,
     args,
+    pubkeys,
     authorityBalance: 1006055200, // INITIAL_ACCOUNT_BALANCE + args.initialFunds
   };
 }
 
 export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateInvites) {
-  const program = workspace.EventInvite as Program<EventInvite>;
-
   const creatorPK = creatorKP.publicKey;
   const accounts = {
     event: eventPK,
@@ -133,7 +153,7 @@ export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateI
     indexBuffer.writeUInt32LE(index);
     return PublicKey.findProgramAddressSync(
       [Buffer.from('invite'), eventPK.toBuffer(), indexBuffer],
-      program.programId
+      eventProgram.programId
     );
   });
 
@@ -146,7 +166,7 @@ export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateI
     };
   });
 
-  const { pubkeys } = await program.methods
+  const { pubkeys } = await eventProgram.methods
     .createInvites(remainingAccountKeys)
     .accounts(accounts)
     .remainingAccounts(remainingAccounts)
@@ -163,45 +183,50 @@ export async function createInvites({ eventPK, creatorKP, numInvites }: ICreateI
 
 export async function rsvpToEvent({
   eventPK,
+  infoPK,
   rsvpStatus,
   authorityPK,
   invitePK,
   inviteID,
   inviteBump,
-  tokenMintPK,
+  mintPK,
   attendeeKP = web3.Keypair.generate(),
 }: IRsvpToEvent) {
-  const program = workspace.EventInvite as Program<EventInvite>;
-  await fundAccount(program.provider.connection, attendeeKP.publicKey, attendeeFunds);
+  await fundAccount(eventProgram.provider.connection, attendeeKP.publicKey, attendeeFunds);
+
+  const rsvpEnum = {
+    [rsvpStatus as RsvpStatusKey]: {},
+  } as unknown as RsvpStatus;
+
+  const args = {
+    rsvpEnum,
+    inviteID: inviteID ?? null,
+    inviteBump: inviteBump ?? null,
+  };
 
   const rsvpAccounts = {
     event: eventPK,
+    info: infoPK,
     invite: invitePK || null,
     attendee: attendeeKP.publicKey,
     authority: authorityPK,
-    tokenMint: tokenMintPK,
+    mint: mintPK,
     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     tokenProgram: TOKEN_PROGRAM_ID,
     systemProgram: web3.SystemProgram.programId,
     rent: web3.SYSVAR_RENT_PUBKEY,
   };
 
-  const rsvpEnum: RsvpStatusArg = {
-    [rsvpStatus]: {},
-  } as const as RsvpStatusArg;
-
-  const { pubkeys } = await program.methods
-    .rsvp(rsvpEnum, inviteID ?? null, inviteBump ?? null)
+  const { pubkeys } = await eventProgram.methods
+    .rsvp(args.rsvpEnum, args.inviteID, args.inviteBump)
     .accounts(rsvpAccounts)
     .signers([attendeeKP])
     .rpcAndKeys(confirmOptions);
 
   console.info(`Successfully RSVPd to event: ${eventPK}`);
-
   return {
     attendeeKP,
-    rsvpPK: pubkeys.rsvp,
-    attendeeAtaPK: pubkeys.attendeeTokenAccount,
+    pubkeys,
     args: {
       rsvpStatus,
     },
@@ -210,8 +235,9 @@ export async function rsvpToEvent({
 
 export async function manyRsvpsToEvent({
   numRsvps,
+  infoPK,
   eventPK,
-  tokenMintPK,
+  mintPK,
   rsvpStatus,
   authorityPK,
 }: Omit<IRsvpToEvent, 'attendeeKP'> & { numRsvps: number }) {
@@ -220,18 +246,17 @@ export async function manyRsvpsToEvent({
     throw new Error('Too many rsvps');
   }
 
-  let count = 0;
+  const promises: ReturnType<typeof rsvpToEvent>[] = [];
   for (let i = 0; i < numRsvps; i++) {
     try {
-      await rsvpToEvent({ eventPK, authorityPK, tokenMintPK, rsvpStatus });
-
-      // Not sure if this is needed but adding a bit of a delay to see if it avoids collisions
-      await new Promise((r) => setTimeout(r, 100));
-      count++;
+      promises.push(rsvpToEvent({ eventPK, infoPK, authorityPK, mintPK, rsvpStatus }));
     } catch {
       /** noop */
     }
   }
 
+  const count = await Promise.allSettled(promises).then((rsvps) =>
+    rsvps.reduce((count, rsvp) => (isFulfilled(rsvp) ? count + 1 : count), 0)
+  );
   console.info(`Successfully created ${count} rsvps`);
 }

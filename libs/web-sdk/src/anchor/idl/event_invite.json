@@ -344,11 +344,11 @@
             "type": "pubkey"
           },
           {
-            "name": "authority_bump",
+            "name": "mint_authority_bump",
             "type": "u8"
           },
           {
-            "name": "token_mint_bump",
+            "name": "mint_bump",
             "type": "u8"
           },
           {

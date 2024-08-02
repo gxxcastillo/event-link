@@ -27,7 +27,7 @@ type IRsvpToEvent = {
   invitePK?: web3.PublicKey;
   inviteID?: number;
   inviteBump?: number;
-  tokenMintPK: web3.PublicKey;
+  mintPK: web3.PublicKey;
 };
 
 const confirmOptions: ConfirmOptions = { commitment: 'confirmed', maxRetries: 10 };
@@ -39,7 +39,7 @@ export async function rsvp({
   invitePK,
   inviteID,
   inviteBump,
-  tokenMintPK,
+  mintPK,
   attendeeKP = web3.Keypair.generate(),
 }: IRsvpToEvent) {
   const rsvpAccounts = {
@@ -47,7 +47,7 @@ export async function rsvp({
     invite: invitePK || null,
     attendee: attendeeKP.publicKey,
     authority: authorityPK,
-    tokenMint: tokenMintPK,
+    mint: mintPK,
     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     tokenProgram: TOKEN_PROGRAM_ID,
     systemProgram: web3.SystemProgram.programId,

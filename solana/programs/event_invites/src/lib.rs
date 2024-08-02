@@ -18,18 +18,14 @@ mod event_invite {
 
     pub fn create_event(
         ctx: Context<CreateEventAccounts>,
-        event_date: i64,
-        max_attendees: u32,
-        metadata_uri: String,
-        is_invite_only: bool,
-        initial_funds: u64
+        metadata: EventMetadata,
+        settings: EventSettings,
+        initial_funds: u64,
     ) -> ProgramResult {
         instructions::create_event(
             ctx,
-            event_date,
-            max_attendees,
-            metadata_uri,
-            is_invite_only,
+            metadata,
+            settings,
             initial_funds
         )
     }
@@ -49,7 +45,7 @@ mod event_invite {
         ctx: Context<RsvpAccounts>,
         status: RsvpStatus,
         invite_id: Option<u32>,
-        invite_bump: Option<u8>
+        invite_bump: Option<u8>,
     ) -> ProgramResult {
         if let Err(error) = instructions::rsvp(ctx, status, invite_id, invite_bump) {
             msg!("{:?}", error);
