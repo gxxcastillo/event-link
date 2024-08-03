@@ -4,7 +4,6 @@ use anchor_spl::associated_token::AssociatedToken;
 
 use crate::state::{ Event, RSVP, Invite, EventInfo };
 
-
 #[derive(Accounts)]
 #[instruction(id: [u8; 9])]
 pub struct CreateEventAccounts<'info> {

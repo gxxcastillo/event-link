@@ -1,14 +1,13 @@
 {
-  "name": "@eventlink/web-components",
+  "name": "@eventlink/web-router",
   "version": "0.0.1",
   "type": "module",
   "exports": "./src/index.js",
   "typings": "./index.d.ts",
+  "private": true,
   "dependencies": {
-    "@eventlink/web-components": "workspace:*",
+    "@eventlink/web-pages": "workspace:*",
     "@eventlink/web-routes": "workspace:*",
-    "@eventlink/web-sdk": "workspace:*",
-    "@solidjs/router": "^0.14.1",
     "solid-js": "^1.8.19"
   },
   "devDependencies": {

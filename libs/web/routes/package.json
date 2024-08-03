@@ -1,0 +1,8 @@
+{
+  "name": "@eventlink/web-routes",
+  "version": "0.0.1",
+  "exports": "./src/index.js",
+  "typings": "./index.d.ts",
+  "private": true,
+  "dependencies": {}
+}

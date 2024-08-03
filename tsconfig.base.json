@@ -20,8 +20,13 @@
     "importHelpers": true,
     "noPropertyAccessFromIndexSignature": false,
     "lib": ["es2020", "dom"],
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@eventlink/web-router": ["libs/web/router/src/index.ts"],
+      "@eventlink/web-routes": ["libs/web/routes/src/index.ts"]
+    }
   },
   "include": ["eslint.config.js"],
   "exclude": ["node_modules", "tmp"]

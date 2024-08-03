@@ -7,7 +7,7 @@ import solidPlugin from 'vite-plugin-solid';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../../node_modules/.vite/libs/web/components',
+  cacheDir: '../../../node_modules/.vite/libs/web/layouts',
 
   plugins: [
     solidPlugin(),
@@ -23,7 +23,7 @@ export default defineConfig({
   // Configuration for building your library.
   // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
-    outDir: '../../../dist/libs/web/components',
+    outDir: '../../../dist/libs/web/layouts',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
@@ -32,7 +32,7 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: 'web-components',
+      name: 'layouts',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
@@ -47,12 +47,12 @@ export default defineConfig({
   test: {
     watch: false,
     globals: true,
-    environment: 'jsdom',
+    environment: 'node',
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
 
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../../coverage/libs/web/components',
+      reportsDirectory: '../../../coverage/libs/web/layouts',
       provider: 'v8',
     },
   },

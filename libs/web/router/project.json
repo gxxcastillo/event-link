@@ -1,0 +1,19 @@
+{
+  "name": "web-router",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/web/router/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/web/router",
+        "main": "libs/web/router/src/index.ts",
+        "tsConfig": "libs/web/router/tsconfig.lib.json",
+        "assets": ["libs/web/router/*.md"]
+      }
+    }
+  }
+}

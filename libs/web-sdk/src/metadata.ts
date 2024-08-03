@@ -6,6 +6,6 @@ export function createMetadata() {
   // @TODO
 }
 
-export function updateeMetadata() {
+export function updateMetadata() {
   // @TODO
 }

@@ -1,0 +1,13 @@
+{
+  "name": "@eventlink/web-layouts",
+  "version": "0.0.1",
+  "exports": "./src/index.js",
+  "typings": "./index.d.ts",
+  "private": true,
+  "dependencies": {
+    "solid-js": "^1.8.19"
+  },
+  "devDependencies": {
+    "vite-plugin-solid": "^2.10.2"
+  }
+}
