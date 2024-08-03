@@ -5,6 +5,7 @@
 /.nx/workspace-data
 
 node_modules
+pnpm-lock.yaml
 .gitignore
 .husky
 .prettierignore
