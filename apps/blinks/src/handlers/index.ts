@@ -8,7 +8,7 @@ import { createActionHeaders } from '@solana/actions';
 import { getHandler } from './get';
 import { postHandler } from './post';
 
-type HttpMethod = 'POST' | 'GET';
+type HttpMethod = 'POST' | 'GET' | 'OPTIONS';
 type HttpHandler = () => Promise<unknown>;
 type HandlerMap = Record<HttpMethod, HttpHandler>;
 type HandlerEvent = APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>;
@@ -16,10 +16,12 @@ type HandlerEvent = APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequ
 const handlerMap: HandlerMap = {
   GET: getHandler,
   POST: postHandler,
+  OPTIONS: () => Promise.resolve(null),
 };
 
 // create the standard headers for this route (including CORS)
 const headers = createActionHeaders();
+delete headers['Access-Control-Allow-Origin'];
 
 export async function handler(event: HandlerEvent): Promise<APIGatewayProxyResult> {
   const method = event.requestContext.http.method.toUpperCase() as HttpMethod;
