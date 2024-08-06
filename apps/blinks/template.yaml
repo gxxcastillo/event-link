@@ -9,10 +9,11 @@ Transform:
 Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-  SolanaActionFunction:
+
+  CreateEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/
+      CodeUri: dist/createEvent
       Handler: index.handler
       Runtime: nodejs20.x
       Architectures:
@@ -23,12 +24,12 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /api/event/create
             Method: GET
         PostEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /api/event/create
             Method: POST
       FunctionUrlConfig:
         AuthType: NONE
@@ -47,6 +48,76 @@ Resources:
             - X-Amz-User-Agent
           MaxAge: 86400 # Cache control max age in seconds
 
+  RsvpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/rsvp
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 128
+      Timeout: 100
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /api/event/{eventID}/invite/{inviteID}/rsvp
+            Method: GET
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /api/event/{eventID}/invite/{inviteID}/rsvp
+            Method: POST
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - '*'
+          AllowMethods:
+            - GET
+            - POST
+          AllowHeaders:
+            - Content-Type
+            - Authorization
+            - X-Amz-Date
+            - X-Api-Key
+            - X-Amz-Security-Token
+            - X-Amz-User-Agent
+          MaxAge: 86400 # Cache control max age in seconds
+
+  GetActionsJsonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/actions
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 128
+      Timeout: 100
+      Events:
+        GetActionsJson:
+          Type: Api
+          Properties:
+            Path: /actions.json
+            Method: GET
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - '*'
+          AllowMethods:
+            - GET
+          AllowHeaders:
+            - Content-Type
+            - Authorization
+            - X-Amz-Date
+            - X-Api-Key
+            - X-Amz-Security-Token
+            - X-Amz-User-Agent
+          MaxAge: 86400
+
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -60,10 +131,12 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: true
+
 Outputs:
   WebEndpoint:
     Description: API Gateway endpoint URL for Prod stage
     Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:

@@ -5,6 +5,19 @@
   "sourceRoot": "apps/blinks/src",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/blinks",
+        "commands": [
+          "vite build --config vite.config.actions.ts",
+          "vite build --config vite.config.createEvent.ts",
+          "vite build --config vite.config.rsvp.ts",
+          "npx rimraf -g 'dist/*/package.json'"
+        ],
+        "parallel": false
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint"
     }

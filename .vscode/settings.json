@@ -1,4 +1,10 @@
 {
+  "eslint.validate": ["json"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnType": false,
+  "editor.formatOnSaveMode": "modifications",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "blockhash",
     "Borsh",
@@ -8,13 +14,12 @@
     "localnet",
     "Pubkey",
     "pubkeys",
+    "querystring",
     "rsvped",
     "Rsvps",
     "solidjs",
     "Sysvar",
     "vinxi",
     "vitest"
-  ],
-  "eslint.validate": ["json"],
-  "typescript.tsdk": "node_modules/typescript/lib"
+  ]
 }

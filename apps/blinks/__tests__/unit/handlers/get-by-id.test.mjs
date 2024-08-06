@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Import getByIdHandler function from get-by-id.mjs
 import { getByIdHandler } from '../../../src/handlers/get-by-id.mjs';
 // Import dynamodb from aws-sdk

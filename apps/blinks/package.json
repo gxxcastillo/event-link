@@ -1,7 +1,6 @@
 {
-  "name": "delete-test-01",
-  "description": "delete-test-01-description",
-  "type": "module",
+  "name": "@eventlink/blinks",
+  "description": "Blinks for the Event Link platform",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -16,6 +15,7 @@
     "@types/aws-lambda": "^8.10.142",
     "aws-sdk-client-mock": "^2.0.0",
     "jest": "^29.2.1",
+    "rimraf": "^6.0.1",
     "typescript": "^5.5.4"
   },
   "jest": {

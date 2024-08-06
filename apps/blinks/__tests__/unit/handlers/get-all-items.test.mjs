@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Import getAllItemsHandler function from get-all-items.mjs
 import { getAllItemsHandler } from '../../../src/handlers/get-all-items.mjs';
 // Import dynamodb from aws-sdk

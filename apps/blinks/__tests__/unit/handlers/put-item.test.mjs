@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Import putItemHandler function from put-item.mjs
 import { putItemHandler } from '../../../src/handlers/put-item.mjs';
 // Import dynamodb from aws-sdk
