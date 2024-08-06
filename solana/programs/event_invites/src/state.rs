@@ -13,6 +13,8 @@ pub struct Event {
     pub id: [u8; 9],
     pub num_invites: u32,
     pub num_rsvps: u32,
+    // @TODO Implement attendance verification
+    // pub num_attendees: u32
 }
 
 #[account]
@@ -57,6 +59,8 @@ pub struct RSVP {
     pub event: Pubkey,
     pub attendee: Pubkey,
     pub status: RsvpStatus,
+    // @TODO Implement attendance verification
+    // pub attended: bool,
     #[max_len(120)]
     pub metadata_uri: String,
 }
