@@ -9,14 +9,19 @@
     "start": "vinxi start"
   },
   "dependencies": {
+    "@eventlink/web-router": "workspace:*",
     "@solidjs/router": "^0.14.1",
     "@solidjs/start": "^1.0.6",
-    "solid-js": "^1.8.18",
+    "solid-js": "^1.8.20",
     "unstorage": "1.10.2",
-    "vinxi": "^0.4.1",
-    "@eventlink/web-router": "workspace:*"
+    "vinxi": "^0.4.1"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "vite-plugin-mkcert": "^1.17.5",
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }

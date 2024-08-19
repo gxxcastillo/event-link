@@ -8,8 +8,10 @@
     "@eventlink/web-components": "workspace:*",
     "@eventlink/web-routes": "workspace:*",
     "@eventlink/web-sdk": "workspace:*",
+    "@eventlink/solid-sol": "workspace:*",
+    "@gxxc/solid-forms": "^0.0.11",
     "@solidjs/router": "^0.14.1",
-    "solid-js": "^1.8.19"
+    "solid-js": "^1.8.20"
   },
   "devDependencies": {
     "vite-plugin-solid": "^2.10.2"

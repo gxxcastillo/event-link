@@ -1,0 +1,19 @@
+{
+  "name": "web-app",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/web/app/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/web/app",
+        "main": "libs/web/app/src/index.ts",
+        "tsConfig": "libs/web/app/tsconfig.lib.json",
+        "assets": ["libs/web/app/*.md"]
+      }
+    }
+  }
+}

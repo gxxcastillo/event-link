@@ -1,0 +1,16 @@
+{
+  "name": "@eventlink/web-adapter",
+  "version": "0.0.1",
+  "exports": "./src/index.js",
+  "typings": "./index.d.ts",
+  "private": true,
+  "dependencies": {
+    "solid-js": "^1.8.20",
+    "@eventlink/web-sdk": "workspace:*",
+    "@eventlink/solid-sol": "workspace:*",
+    "@solana/web3.js": "1.95.2"
+  },
+  "devDependencies": {
+    "vite-plugin-solid": "^2.10.2"
+  }
+}

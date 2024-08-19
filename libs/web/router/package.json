@@ -8,7 +8,9 @@
   "dependencies": {
     "@eventlink/web-pages": "workspace:*",
     "@eventlink/web-routes": "workspace:*",
-    "solid-js": "^1.8.19"
+    "@solana/web3.js": "^1.95.2",
+    "@solidjs/router": "^0.14.1",
+    "solid-js": "^1.8.20"
   },
   "devDependencies": {
     "vite-plugin-solid": "^2.10.2"

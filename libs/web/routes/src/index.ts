@@ -1,7 +1,7 @@
 export const routes = {
   root: '/',
-  home: '/home',
-  view: '/:pk',
+  // home: 'home',
+  view: ':pk',
   my_events: '/my/events',
   my_invites: '/my/invites',
   my_rsvps: '/my/rsvps',

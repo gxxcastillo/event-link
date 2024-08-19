@@ -2,7 +2,7 @@ import { web3 } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { ConfirmOptions } from '@solana/web3.js';
 
-import { events } from './utils';
+import { events } from '../utils';
 
 // @TODO
 import { nanoid } from 'nanoid';

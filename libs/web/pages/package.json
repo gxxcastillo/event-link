@@ -3,13 +3,19 @@
   "version": "0.0.1",
   "type": "module",
   "exports": {
-    "./Home": "./src/HomePage/HomePage.js"
+    "./AppRoute": "./src/AppRoute/AppRoute.js",
+    "./Home": "./src/HomePage/HomePage.js",
+    "./View": "./src/ViewPage/ViewPage.js"
   },
   "typings": "./index.d.ts",
   "dependencies": {
-    "solid-js": "^1.8.19",
+    "@eventlink/solid-sol": "workspace:*",
+    "@eventlink/web-adapter": "workspace:*",
     "@eventlink/web-components": "workspace:*",
-    "@eventlink/web-sdk": "workspace:*"
+    "@eventlink/web-layouts": "workspace:*",
+    "@eventlink/web-sdk": "workspace:*",
+    "@solana/web3.js": "^1.95.2",
+    "solid-js": "^1.8.20"
   },
   "devDependencies": {
     "vite": "^5.3.5",

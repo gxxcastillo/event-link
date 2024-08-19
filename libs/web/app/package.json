@@ -1,0 +1,10 @@
+{
+  "name": "@eventlink/web-app",
+  "version": "0.0.1",
+  "exports": "./src/index.js",
+  "typings": "./index.d.ts",
+  "private": true,
+  "dependencies": {
+    "solid-js": "^1.8.20"
+  }
+}

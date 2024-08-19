@@ -4,8 +4,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "clean": "pnpm clean:node_modules",
+    "clean": "pnpm clean:node_modules && pnpm clean:dist",
     "clean:node_modules": "find . -name 'node_modules' -print -type d -prune -exec rm -rf '{}' + ",
+    "clean:dist": "find . -name 'dist' -print -type d -prune -exec rm -rf '{}' + ",
     "lint": "pnpm nx run-many --target=lint",
     "format": "pnpm prettier . --write",
     "prepare": "husky"
