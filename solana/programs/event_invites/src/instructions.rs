@@ -1,4 +1,5 @@
-use anchor_lang::{ prelude::*, Discriminator };
+use anchor_lang::prelude::*;
+use anchor_lang::Discriminator;
 use anchor_lang::solana_program::entrypoint::ProgramResult;
 use anchor_lang::solana_program::system_instruction::create_account;
 use anchor_lang::solana_program::program::invoke_signed;
@@ -64,7 +65,7 @@ pub fn create_invites<'a, 'b, 'c, 'd>(
 
     let space = 8 + Invite::INIT_SPACE;
     let lamports = Rent::get()?.minimum_balance(space);
-    let discriminator = Invite::discriminator();
+    let discriminator = Invite::DISCRIMINATOR;
 
     let event_pk = event.key();
     let invite_accounts = &ctx.remaining_accounts;

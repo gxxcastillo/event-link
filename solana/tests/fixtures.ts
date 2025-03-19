@@ -1,4 +1,4 @@
-import { web3, workspace, Program, IdlTypes, Provider } from '@coral-xyz/anchor';
+import { web3, workspace, Program, IdlTypes, Provider, setProvider, AnchorProvider } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { ConfirmOptions, Connection, SendTransactionError, Keypair, PublicKey } from '@solana/web3.js';
 import { faker } from '@faker-js/faker';
@@ -36,6 +36,7 @@ export type IRsvpToEvent = {
   mintPK: web3.PublicKey;
 };
 
+setProvider(AnchorProvider.env());
 export const eventProgram = workspace.EventInvite as Program<EventInvite>;
 await augmentProvider(eventProgram.provider);
 
@@ -45,7 +46,7 @@ const authorityFunds = sol + txCost;
 const creatorFunds = 5 * sol + authorityFunds;
 const attendeeFunds = creatorFunds;
 
-const confirmOptions: ConfirmOptions = { commitment: 'confirmed', maxRetries: 10 };
+const confirmOptions: ConfirmOptions = { commitment: 'processed', maxRetries: 10 };
 
 function padByteArray(uint8Array: Uint8Array, size: number) {
   const paddedArray = new Uint8Array(size);

@@ -3,12 +3,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-event_invites = "HvdMiRfuZs9M5KC5LcWpAQnetxHqKdyjqGVFvGvRm3WY"
+event_invites = "DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6"
+
+[programs.devnet]
+event_invites = "DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
+## cluster = "https://free.rpcpool.com"
 cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 

@@ -8,7 +8,7 @@ describe('event_invites', () => {
   it('Can create an event', async () => {
     const { args, pubkeys, creatorKP, authorityBalance } = await createNewEvent();
 
-    const event = await eventProgram.account.event.fetch(pubkeys.event, 'confirmed');
+    const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
     expect(event).toMatchObject({
       dateCreated: expect.any(BN),
       dateUpdated: expect.any(BN),
@@ -21,7 +21,7 @@ describe('event_invites', () => {
       numRsvps: event.numRsvps,
     });
 
-    const eventInfo = await eventProgram.account.eventInfo.fetch(pubkeys.info, 'confirmed');
+    const eventInfo = await eventProgram.account.eventInfo.fetch(pubkeys.info, 'processed');
     expect(eventInfo).toMatchObject({
       dateUpdated: expect.any(BN),
       authority: creatorKP.publicKey,
@@ -59,7 +59,7 @@ describe('event_invites', () => {
       const { pubkeys, creatorKP } = await createNewEvent({ maxAttendees: 10 });
       const { inviteKeys } = await createInvites({ eventPK: pubkeys.event, creatorKP, numInvites: 5 });
 
-      const event = await eventProgram.account.event.fetch(pubkeys.event, 'confirmed');
+      const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
 
       expect(event.dateUpdated).to.not.equal(event.dateCreated);
       expect(event.numInvites).to.equal(5);
@@ -112,11 +112,11 @@ describe('event_invites', () => {
       ]);
 
       const [rsvp1State, rsvp2State, rsvp3State, rsvp4State, eventState] = await Promise.all([
-        eventProgram.account.rsvp.fetch(rsvp1?.pubkeys.rsvp as PublicKey, 'confirmed'),
-        eventProgram.account.rsvp.fetch(rsvp2?.pubkeys.rsvp as PublicKey, 'confirmed'),
-        eventProgram.account.rsvp.fetch(rsvp3?.pubkeys.rsvp as PublicKey, 'confirmed'),
-        eventProgram.account.rsvp.fetch(rsvp4?.pubkeys.rsvp as PublicKey, 'confirmed'),
-        await eventProgram.account.event.fetch(pubkeys.event, 'confirmed'),
+        eventProgram.account.rsvp.fetch(rsvp1?.pubkeys.rsvp as PublicKey, 'processed'),
+        eventProgram.account.rsvp.fetch(rsvp2?.pubkeys.rsvp as PublicKey, 'processed'),
+        eventProgram.account.rsvp.fetch(rsvp3?.pubkeys.rsvp as PublicKey, 'processed'),
+        eventProgram.account.rsvp.fetch(rsvp4?.pubkeys.rsvp as PublicKey, 'processed'),
+        await eventProgram.account.event.fetch(pubkeys.event, 'processed'),
       ]);
 
       expect(rsvp1State).toMatchObject({
@@ -167,8 +167,8 @@ describe('event_invites', () => {
       ]);
 
       const [rsvp1State, rsvp2State, rsvp3] = await Promise.all([
-        eventProgram.account.rsvp.fetch(rsvp1.pubkeys.rsvp, 'confirmed'),
-        eventProgram.account.rsvp.fetch(rsvp2.pubkeys.rsvp, 'confirmed'),
+        eventProgram.account.rsvp.fetch(rsvp1.pubkeys.rsvp, 'processed'),
+        eventProgram.account.rsvp.fetch(rsvp2.pubkeys.rsvp, 'processed'),
 
         // attendee 1 changes their rsvp
         rsvpToEvent({
@@ -199,8 +199,8 @@ describe('event_invites', () => {
       expect(rsvp1.pubkeys.rsvp).toEqual(rsvp3.pubkeys.rsvp);
 
       const [rsvp3State, eventState] = await Promise.all([
-        eventProgram.account.rsvp.fetch(rsvp3.pubkeys.rsvp, 'confirmed'),
-        eventProgram.account.event.fetch(pubkeys.event, 'confirmed'),
+        eventProgram.account.rsvp.fetch(rsvp3.pubkeys.rsvp, 'processed'),
+        eventProgram.account.event.fetch(pubkeys.event, 'processed'),
       ]);
 
       expect(rsvp1State.event).toEqual(rsvp3State.event);
@@ -221,7 +221,7 @@ describe('event_invites', () => {
         rsvpStatus: 'accepted',
       });
 
-      const eventState = await eventProgram.account.event.fetch(pubkeys.event, 'confirmed');
+      const eventState = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
       expect(eventState.numRsvps).toBe(4);
     });
 
@@ -260,7 +260,7 @@ describe('event_invites', () => {
         inviteBump: bump,
       });
 
-      const rsvp = await eventProgram.account.rsvp.fetch(rsvpPubkeys.rsvp, 'confirmed');
+      const rsvp = await eventProgram.account.rsvp.fetch(rsvpPubkeys.rsvp, 'processed');
       expect(rsvp).toMatchObject({
         attendee: attendeeKP.publicKey,
         event: eventPubkeys.event,

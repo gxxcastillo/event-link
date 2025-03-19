@@ -10,7 +10,7 @@ use context::*;
 use state::*;
 use instructions::*;
 
-declare_id!("HvdMiRfuZs9M5KC5LcWpAQnetxHqKdyjqGVFvGvRm3WY");
+declare_id!("DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6");
 
 #[program]
 mod event_invite {
