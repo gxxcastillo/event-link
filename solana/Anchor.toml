@@ -3,10 +3,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-event_invites = "qVy1Hfus32BxCaPNx14QdG8QtGueV7vKJ37UjNbRS2c"
+event_link = "43JphYWEWMUiBRiYavxpwLENUVDGxz8LzbdKhZ1noekr"
 
 [programs.devnet]
-event_invites = "DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6"
+event_link = "DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6"
 
 [provider]
 cluster = "localnet"

@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 import { type EventLinkProgram } from './types';
 import { nanoid } from 'nanoid';
 import { stringToNumberArray } from '../utils';
+import logger from 'loglevel';
 
 export type CreateInvitesOptions = {
   numInvites: number;
@@ -58,17 +59,7 @@ export async function createInvites(
   const tx = program.methods.createInvites(inviteKeys).accounts(accounts).remainingAccounts(invitePubkeys);
   const { pubkeys } = await tx.rpcAndKeys(confirmOptions);
 
-  console.info(`Successfully created ${numInvites} invites for event: ${eventPK.toBase58()}`);
-
-  // const { pubkeys } = await program.methods
-  //   .createInvites(inviteKeys)
-  //   .accounts(accounts)
-  //   .remainingAccounts(invitePubkeys)
-  //   .signers([r])
-  //   .rpcAndKeys(confirmOptions);
-
-  console.info(`Successfully created event: ${eventPK}`);
-
+  logger.info(`Successfully created ${numInvites} invites for event: ${eventPK.toBase58()}`);
   return {
     pubkeys,
     inviteKeys: remainingAccounts.map(({ idStr, id, bump, pubkey }) => ({

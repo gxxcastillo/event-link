@@ -1,5 +1,5 @@
 {
-  "name": "@eventlink/program-event-invites",
+  "name": "@eventlink/program-event-link",
   "type": "module",
   "license": "ISC",
   "dependencies": {

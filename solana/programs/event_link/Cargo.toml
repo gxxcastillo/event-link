@@ -1,12 +1,12 @@
 [package]
-name = "event_invites"
+name = "event_link"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "event_invites"
+name = "event_link"
 
 [features]
 # Default build (on-chain)

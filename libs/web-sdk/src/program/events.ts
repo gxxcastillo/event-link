@@ -64,10 +64,7 @@ export async function getEvents(
     },
   ]);
 
-  return programAccounts.map((a) => {
-    console.log('!!! fetched publicKey', a.publicKey?.toBase58());
-    return [a.publicKey, a.account];
-  });
+  return programAccounts.map((program) => [program.publicKey, program.account]);
 }
 
 export async function getEventInfo(program: EventLinkProgram, eventPubkey: PublicKey) {

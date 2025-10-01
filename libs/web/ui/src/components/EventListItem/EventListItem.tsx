@@ -1,4 +1,4 @@
-import { createEffect, createResource, Show } from 'solid-js';
+import { createResource, Show } from 'solid-js';
 import { type Event } from '@eventlink/web-sdk';
 import { type PublicKey } from '@solana/web3.js';
 import { useEventLink } from '@eventlink/web-sdk/solid';
@@ -20,10 +20,6 @@ export function EventListItem(props: EventListItemProps) {
 
   const eventLink = useEventLink();
   const [eventInfo] = createResource(props.eventPubKey, getEventInfo);
-
-  createEffect(() => {
-    console.log(eventInfo()?.metadata.date.toNumber());
-  });
 
   return (
     <li class="EventListItem">

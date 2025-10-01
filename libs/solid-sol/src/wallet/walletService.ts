@@ -44,6 +44,10 @@ export function createWalletService(props: CreateWalletStoreProps) {
       return;
     }
 
+    if (currentWallet.publicKey && currentWallet.publicKey.toBase58() !== state.address) {
+      await disconnect();
+    }
+
     if (!canConnect(state.status)) {
       console.info(`Unable to connect, wallet status: ${state.status}`);
       return;

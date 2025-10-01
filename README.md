@@ -1,6 +1,6 @@
 # Event Link
 
-EventLink is a decentralized event management platform designed to securely and seamlessly connect people for gatherings and events. Using blockchain technology, EventLink ensures transparent, efficient, and trustworthy event planning and participation.
+EventLink is a decentralized event management platform designed to securely and seamlessly connect people for gatherings and events. EventLink ensures transparent, efficient, and trustworthy event planning and participation.
 
 ## Running tasks
 
@@ -30,6 +30,6 @@ A poc web client for interacting with the event-links program code
 
 ## Anchor
 
-Solana program code is written using the Anchor framework. All program code lives in `solana/programs/event-links`. Tests are all written in js and live in `solana/tests`
+Solana program code is written using the Anchor framework. All program code lives in `solana/programs/event-link`. Tests are all written in js and live in `solana/tests`
 
 ## Manual verification

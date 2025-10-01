@@ -2,11 +2,11 @@ import { type IdlTypes, type Program } from '@coral-xyz/anchor';
 import { type SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { type PublicKey } from '@solana/web3.js';
 
-import { type EventInvites } from '../anchor/types/event_invites';
+import { type EventLink } from '../anchor/types/event_link';
 
-type EventLinkTypes = IdlTypes<EventInvites>;
+type EventLinkTypes = IdlTypes<EventLink>;
 
-export type EventLinkProgram = Program<EventInvites>;
+export type EventLinkProgram = Program<EventLink>;
 export type Event = EventLinkTypes['event'];
 export type EventInfo = EventLinkTypes['eventInfo'];
 
@@ -27,4 +27,4 @@ export type CreateEventMetadata = Omit<EventMetadata, 'date' | 'status'> & {
 export type Wallet = SignerWalletAdapter;
 export type ConnectedWallet = Omit<Wallet, 'publicKey'> & { publicKey: PublicKey };
 
-export { type EventInvites as EventLinkIdl };
+export { type EventLink as EventLinkIdl };

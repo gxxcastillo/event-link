@@ -1,7 +1,7 @@
 // import { PublicKey } from '@solana/web3.js';
 // import { BN } from '@coral-xyz/anchor';
 import { expect } from 'vitest';
-// import { EventInvites } from '../target/types/event_invites';
+// import { EventLink } from '../target/types/event_link';
 
 // const EVENT_DISCRIMINATOR_LENGTH = 8;
 // const CREATOR_OFFSET = EVENT_DISCRIMINATOR_LENGTH + 8 + 8; // after 2 i64s
@@ -24,7 +24,7 @@ describe('Account Layouts', () => {
 
     // Serialize using Anchor's Borsh implementation
     // const discriminator = accountDiscriminator('Event');
-    // const layout = utils.structLayout(EventInvitesIDL.accounts.find((a) => a.name === 'Event')!);
+    // const layout = utils.structLayout(EventLinkIDL.accounts.find((a) => a.name === 'Event')!);
     // const data = Buffer.concat([discriminator, layout.encode(event)]);
 
     // Confirm discriminator length

@@ -7,10 +7,10 @@ import { faker } from '@faker-js/faker';
 import BN from 'bn.js';
 import { nanoid } from 'nanoid';
 
-import { type EventInvites } from '../target/types/event_invites.js';
+import { type EventLink } from '../target/types/event_link.js';
 
-export type EventInfo = IdlTypes<EventInvites>['eventInfo'];
-export type RsvpStatus = IdlTypes<EventInvites>['rsvpStatus'];
+export type EventInfo = IdlTypes<EventLink>['eventInfo'];
+export type RsvpStatus = IdlTypes<EventLink>['rsvpStatus'];
 export type RsvpStatusKey = keyof RsvpStatus;
 
 export type ICreateNewEvent = {
@@ -38,7 +38,7 @@ export type IRsvpToEvent = {
   mintPK: web3.PublicKey;
 };
 
-export const eventProgram = workspace.EventInvites as Program<EventInvites>;
+export const eventProgram = workspace.EventLink as Program<EventLink>;
 
 const txCost = 5108640;
 const authorityFunds = LAMPORTS_PER_SOL + txCost;

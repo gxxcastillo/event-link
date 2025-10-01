@@ -11,7 +11,7 @@ import {
   createUserAccount,
 } from './fixtures.js';
 
-describe('event_invites', () => {
+describe('event_link', () => {
   describe('createEvent', () => {
     it('Creates an event', async () => {
       const creatorKP = await createUserAccount();

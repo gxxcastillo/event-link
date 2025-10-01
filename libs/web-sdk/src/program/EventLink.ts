@@ -1,7 +1,7 @@
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { type PublicKey, type Connection } from '@solana/web3.js';
 
-import idl from '../anchor/idl/event_invites.json';
+import idl from '../anchor/idl/event_link.json';
 
 import {
   type ConnectedWallet,
