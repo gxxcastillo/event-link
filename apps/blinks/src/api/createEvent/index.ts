@@ -1,7 +1,7 @@
 import {
-  APIGatewayEventRequestContext,
-  APIGatewayProxyEventV2WithRequestContext,
-  APIGatewayProxyResult,
+  type APIGatewayEventRequestContext,
+  type APIGatewayProxyEventV2WithRequestContext,
+  type APIGatewayProxyResult,
 } from 'aws-lambda';
 import { createActionHeaders } from '@solana/actions';
 

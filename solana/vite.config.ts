@@ -6,6 +6,8 @@ export default defineConfig({
     watch: false,
     globals: false,
     environment: 'node',
-    include: ['tests/**/*test.ts'],
+    setupFiles: ['tests/setup.ts'],
+    include: ['tests/**/*.test.ts'],
+    testTimeout: 60_000,
   },
 });

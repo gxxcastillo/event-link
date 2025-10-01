@@ -1,0 +1,15 @@
+{
+  "name": "@eventlink/web-adapters",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "typings": "./index.d.ts",
+  "private": true,
+  "dependencies": {
+    "@eventlink/localhost-wallet": "workspace:*",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/web3.js": "^1.98.4"
+  }
+}

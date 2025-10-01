@@ -1,19 +1,27 @@
-import { createContext, ParentProps } from 'solid-js';
+import { type ParentProps } from 'solid-js';
+import { createContext, useContext } from 'solid-js';
+import { type Connection } from '@solana/web3.js';
 
-import { createWalletStore } from './walletState';
-import { WalletStore } from './types';
-import { Connection, type ConnectionConfig } from '@solana/web3.js';
+import { type WalletService } from './walletService';
+import { createWalletService } from './walletService';
+import { type SignerWalletAdapter } from '@solana/wallet-adapter-base';
 
-export interface ConnectionProviderProps extends ParentProps {
-  endpoint: string;
-  configs?: ConnectionConfig;
+export interface WalletProviderProps extends ParentProps {
+  wallet: SignerWalletAdapter;
+  connection: Connection;
 }
 
-export const WalletContext = createContext<WalletStore>({} as WalletStore);
+export const WalletContext = createContext<WalletService | undefined>();
 
-export function WalletProvider(props: ConnectionProviderProps) {
-  const connection = new Connection(props.endpoint, props.configs);
-  const store = createWalletStore({ connection });
+export function useWalletService(): WalletService {
+  const ctx = useContext(WalletContext);
+  if (!ctx) {
+    throw new Error('WalletContext not found. Make sure you wrapped your component with <WalletProvider>.');
+  }
+  return ctx;
+}
 
-  return <WalletContext.Provider value={store}>{props.children}</WalletContext.Provider>;
+export function WalletProvider(props: WalletProviderProps) {
+  const service = createWalletService({ connection: props.connection, wallet: props.wallet });
+  return <WalletContext.Provider value={service}>{props.children}</WalletContext.Provider>;
 }

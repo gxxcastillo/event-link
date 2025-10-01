@@ -1,7 +1,7 @@
 {
   "name": "web-routes",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/web/routes/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
   "tags": [],
   "targets": {

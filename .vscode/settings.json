@@ -1,17 +1,21 @@
 {
-  "eslint.validate": ["json"],
+  "eslint.useFlatConfig": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnType": false,
-  "editor.formatOnSaveMode": "modifications",
   "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/test-ledger": true
+  },
   "cSpell.words": [
     "blockhash",
     "Borsh",
     "devkit",
     "eventlink",
     "Keypair",
+    "keypairs",
     "localnet",
+    "nacl",
     "Pubkey",
     "pubkeys",
     "querystring",
@@ -19,7 +23,6 @@
     "Rsvps",
     "solidjs",
     "Sysvar",
-    "vinxi",
     "vitest"
   ]
 }

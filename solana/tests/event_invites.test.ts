@@ -2,61 +2,95 @@ import { describe, it, expect } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
-import { eventProgram, createNewEvent, createInvites, rsvpToEvent, manyRsvpsToEvent } from './fixtures.js';
+import {
+  eventProgram,
+  createNewEvent,
+  createInvites,
+  rsvpToEvent,
+  manyRsvpsToEvent,
+  createUserAccount,
+} from './fixtures.js';
 
 describe('event_invites', () => {
-  it('Can create an event', async () => {
-    const { args, pubkeys, creatorKP, authorityBalance } = await createNewEvent();
+  describe('createEvent', () => {
+    it('Creates an event', async () => {
+      const creatorKP = await createUserAccount();
+      const { args, pubkeys, authorityBalance } = await createNewEvent({ creatorKP });
 
-    const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
-    expect(event).toMatchObject({
-      dateCreated: expect.any(BN),
-      dateUpdated: expect.any(BN),
-      creator: creatorKP.publicKey,
-      authority: creatorKP.publicKey,
-      infoBump: event.infoBump,
-      mintAuthorityBump: event.mintAuthorityBump,
-      mintBump: event.mintBump,
-      numInvites: event.numInvites,
-      numRsvps: event.numRsvps,
+      const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
+      expect(event).toMatchObject({
+        dateCreated: expect.any(BN),
+        dateUpdated: expect.any(BN),
+        creator: creatorKP.publicKey,
+        authority: creatorKP.publicKey,
+        infoBump: event.infoBump,
+        mintAuthorityBump: event.mintAuthorityBump,
+        mintBump: event.mintBump,
+        numInvites: event.numInvites,
+        numRsvps: event.numRsvps,
+      });
+
+      const eventInfo = await eventProgram.account.eventInfo.fetch(pubkeys.info, 'processed');
+      expect(eventInfo).toMatchObject({
+        dateUpdated: expect.any(BN),
+        authority: creatorKP.publicKey,
+        metadata: args.metadata,
+        settings: args.settings,
+      });
+
+      const balance = await eventProgram.provider.connection.getBalance(pubkeys.mintAuthority);
+      expect(balance).toBe(authorityBalance);
+
+      const [info, infoBump] = PublicKey.findProgramAddressSync(
+        [Buffer.from('info'), pubkeys.event.toBuffer()],
+        eventProgram.programId
+      );
+      expect(info).toStrictEqual(pubkeys.info);
+      expect(infoBump).toBe(event.infoBump);
+
+      const [mintAuthority, mintAuthorityBump] = PublicKey.findProgramAddressSync(
+        [Buffer.from('mint_authority'), pubkeys.event.toBuffer()],
+        eventProgram.programId
+      );
+      expect(mintAuthority).toStrictEqual(pubkeys.mintAuthority);
+      expect(mintAuthorityBump).toBe(event.mintAuthorityBump);
+
+      const [mint, mintBump] = PublicKey.findProgramAddressSync(
+        [Buffer.from('mint'), pubkeys.event.toBuffer()],
+        eventProgram.programId
+      );
+      expect(mint).toStrictEqual(pubkeys.mint);
+      expect(mintBump).toBe(event.mintBump);
     });
-
-    const eventInfo = await eventProgram.account.eventInfo.fetch(pubkeys.info, 'processed');
-    expect(eventInfo).toMatchObject({
-      dateUpdated: expect.any(BN),
-      authority: creatorKP.publicKey,
-      metadata: args.metadata,
-      settings: args.settings,
-    });
-
-    const balance = await eventProgram.provider.connection.getBalance(pubkeys.mintAuthority);
-    expect(balance).toBe(authorityBalance);
-
-    const [info, infoBump] = PublicKey.findProgramAddressSync(
-      [Buffer.from('info'), pubkeys.event.toBuffer()],
-      eventProgram.programId
-    );
-    expect(info).toStrictEqual(pubkeys.info);
-    expect(infoBump).toBe(event.infoBump);
-
-    const [mintAuthority, mintAuthorityBump] = PublicKey.findProgramAddressSync(
-      [Buffer.from('mint_authority'), pubkeys.event.toBuffer()],
-      eventProgram.programId
-    );
-    expect(mintAuthority).toStrictEqual(pubkeys.mintAuthority);
-    expect(mintAuthorityBump).toBe(event.mintAuthorityBump);
-
-    const [mint, mintBump] = PublicKey.findProgramAddressSync(
-      [Buffer.from('mint'), pubkeys.event.toBuffer()],
-      eventProgram.programId
-    );
-    expect(mint).toStrictEqual(pubkeys.mint);
-    expect(mintBump).toBe(event.mintBump);
   });
 
   describe('createInvites()', () => {
     it('User can create invites to an event', async () => {
-      const { pubkeys, creatorKP } = await createNewEvent({ maxAttendees: 10 });
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP, maxAttendees: 10 });
+      const { inviteKeys } = await createInvites({ eventPK: pubkeys.event, creatorKP, numInvites: 5 });
+
+      const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
+
+      expect(event.dateUpdated).to.not.equal(event.dateCreated);
+      expect(event.numInvites).to.equal(5);
+
+      const invitePubkeys = inviteKeys.map((invite) => invite.pubkey);
+      const invites = await eventProgram.account.invite.fetchMultiple(invitePubkeys);
+
+      invites.forEach((invite) => {
+        expect(invite).to.have.property('event');
+        expect(invite?.event.toString()).to.equal(pubkeys.event.toString());
+
+        expect(invite).to.have.property('rsvp').to.equal(null);
+      });
+    });
+  });
+
+  describe('getEvents()', () => {
+    it("gets all of a user's events", async () => {
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP, maxAttendees: 10 });
       const { inviteKeys } = await createInvites({ eventPK: pubkeys.event, creatorKP, numInvites: 5 });
 
       const event = await eventProgram.account.event.fetch(pubkeys.event, 'processed');
@@ -78,7 +112,8 @@ describe('event_invites', () => {
 
   describe('rsvp()', () => {
     it('Users can rsvp to an event', async () => {
-      const { pubkeys } = await createNewEvent();
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP });
 
       const [rsvp1, rsvp2, rsvp3, rsvp4] = await Promise.all([
         rsvpToEvent({
@@ -147,7 +182,8 @@ describe('event_invites', () => {
     });
 
     it('Users can update their rsvp', async () => {
-      const { pubkeys } = await createNewEvent();
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP });
 
       const [rsvp1, rsvp2] = await Promise.all([
         rsvpToEvent({
@@ -211,7 +247,8 @@ describe('event_invites', () => {
     });
 
     it('Does not allow > max_attendees', { timeout: 10000 }, async () => {
-      const { pubkeys } = await createNewEvent({ maxAttendees: 4 });
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP, maxAttendees: 4 });
       await manyRsvpsToEvent({
         eventPK: pubkeys.event,
         infoPK: pubkeys.info,
@@ -226,9 +263,10 @@ describe('event_invites', () => {
     });
 
     it('Requires an invite to RSVP for an "is_invite_only" event', async () => {
-      const { pubkeys } = await createNewEvent({ isInviteOnly: true });
+      const creatorKP = await createUserAccount();
+      const { pubkeys } = await createNewEvent({ creatorKP, isInviteOnly: true });
 
-      expect(async () => {
+      await expect(async () => {
         await rsvpToEvent({
           eventPK: pubkeys.event,
           infoPK: pubkeys.info,
@@ -240,7 +278,9 @@ describe('event_invites', () => {
     });
 
     it('Permits a user with an invite to RSVP for an "is_invite_only" event', async () => {
-      const { creatorKP, pubkeys: eventPubkeys } = await createNewEvent({
+      const creatorKP = await createUserAccount();
+      const { pubkeys: eventPubkeys } = await createNewEvent({
+        creatorKP,
         isInviteOnly: true,
       });
 

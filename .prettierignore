@@ -15,7 +15,3 @@ pnpm-lock.yaml
 target
 *.toml
 anchor/idl
-
-## TEMPORARY
-apps/web-client
-libs/web-client

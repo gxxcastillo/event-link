@@ -4,24 +4,29 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "@eventlink/web-router": "workspace:*",
-    "@solidjs/router": "^0.14.1",
-    "@solidjs/start": "^1.0.6",
-    "solid-js": "^1.8.20",
-    "unstorage": "1.10.2",
-    "vinxi": "^0.4.1"
+    "@eventlink/localhost-wallet": "workspace:*",
+    "@eventlink/web-ui": "workspace:*",
+    "@eventlink/web-adapters": "workspace:*",
+    "@solidjs/start": "^1.2.0",
+    "loglevel": "^1.9.2",
+    "solid-js": "^1.9.9"
   },
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
     "@solana/wallet-adapter-base": "^0.9.23",
-    "vite-plugin-mkcert": "^1.17.5",
-    "vite-plugin-node-polyfills": "^0.22.0"
+    "solid-devtools": "^0.34.3",
+    "typescript": "5.9.2",
+    "vite": "^7.1.4",
+    "vite-plugin-mkcert": "^1.17.8",
+    "vite-plugin-node-polyfills": "^0.24.0",
+    "vite-plugin-solid": "^2.11.8"
   }
 }

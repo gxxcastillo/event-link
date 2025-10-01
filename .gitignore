@@ -43,3 +43,9 @@ Thumbs.db
 .nx/workspace-data
 .aws-sam
 /test-ledger
+vite.config.ts.timestamp*
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md

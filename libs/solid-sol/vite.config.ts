@@ -6,7 +6,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/libs/solid-sol',
+  cacheDir: './node_modules/.vite',
 
   plugins: [
     nxViteTsPaths(),

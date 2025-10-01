@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
+import { type APIGatewayProxyResult, type APIGatewayProxyEvent } from 'aws-lambda';
 import { createActionHeaders } from '@solana/actions';
 
 import { getHandler } from './get';

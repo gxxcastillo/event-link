@@ -1,4 +1,5 @@
-import { ActionPostResponse, createPostResponse } from '@solana/actions';
+import { type ActionPostResponse } from '@solana/actions';
+import { createPostResponse } from '@solana/actions';
 import { ComputeBudgetProgram, Keypair, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 export async function postHandler(eventID: string, inviteID: string, response: string) {

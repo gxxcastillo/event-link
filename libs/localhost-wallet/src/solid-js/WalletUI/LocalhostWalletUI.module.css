@@ -1,0 +1,19 @@
+.LocalhostWalletUI {
+  border: 1px solid #777;
+  border-radius: 5px;
+  box-shadow: -1px 1px 6px #aaa;
+  cursor: grab;
+  padding: 60px 20px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  bottom: auto;
+  left: auto;
+  margin: 0;
+  transform: none;
+  max-width: 300px;
+}
+
+.LocalhostWalletUI:active {
+  cursor: grabbing;
+}

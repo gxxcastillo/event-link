@@ -10,10 +10,10 @@ use context::*;
 use state::*;
 use instructions::*;
 
-declare_id!("DNZj9E2Zr3dupWJk9Bt6b9eHYdyi9Msv9VzLpv9WQKy6");
+declare_id!("qVy1Hfus32BxCaPNx14QdG8QtGueV7vKJ37UjNbRS2c");
 
 #[program]
-mod event_invite {
+mod event_invites {
     use super::*;
 
     pub fn create_event(

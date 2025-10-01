@@ -1,11 +1,17 @@
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
-import { PublicKey, Connection } from '@solana/web3.js';
+import { type PublicKey, type Connection } from '@solana/web3.js';
 
-import idl from '../anchor/idl/event_invite.json';
+import idl from '../anchor/idl/event_invites.json';
 
-import { ConnectedWallet, CreateEventMetadata, EventLinkIdl, EventLinkProgram, EventSettings } from './types';
-import { createEvent } from './events';
-import { createInvites } from './invites';
+import {
+  type ConnectedWallet,
+  type CreateEventMetadata,
+  type EventLinkIdl,
+  type EventLinkProgram,
+  type EventSettings,
+} from './types';
+import { createEvent, getEventInfo, getEvents } from './events';
+import { createInvites, type CreateInvitesOptions } from './invites';
 
 export class EventLink {
   private program: EventLinkProgram;
@@ -15,12 +21,20 @@ export class EventLink {
     this.program = new Program(idl as EventLinkIdl, provider);
   }
 
-  createEvent(metadata: CreateEventMetadata, settings: EventSettings) {
+  async createEvent(metadata: CreateEventMetadata, settings: EventSettings) {
     return createEvent(this.program, metadata, settings);
   }
 
-  createInvites(event: PublicKey, options: { numInvites: number }) {
+  async createInvites(event: PublicKey, options: CreateInvitesOptions) {
     return createInvites(this.program, event, options);
+  }
+
+  async getEvents(creator: PublicKey) {
+    return getEvents(this.program, creator);
+  }
+
+  async getEventInfo(eventPubKey: PublicKey) {
+    return getEventInfo(this.program, eventPubKey);
   }
 
   rsvp() {}

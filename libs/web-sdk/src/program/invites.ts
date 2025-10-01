@@ -1,8 +1,11 @@
 import { web3 } from '@coral-xyz/anchor';
-import { ConfirmOptions, PublicKey } from '@solana/web3.js';
+import { type ConfirmOptions } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { type EventLinkProgram } from './types';
+import { nanoid } from 'nanoid';
+import { stringToNumberArray } from '../utils';
 
-type CreateInvitesOptions = {
+export type CreateInvitesOptions = {
   numInvites: number;
 };
 
@@ -15,6 +18,10 @@ export async function createInvites(
   { numInvites }: CreateInvitesOptions
 ) {
   const creatorPK = program.provider.publicKey;
+  if (!creatorPK) {
+    throw new Error('Provider does not have a connected public key');
+  }
+
   const accounts = {
     event: eventPK,
     creator: creatorPK,
@@ -22,22 +29,24 @@ export async function createInvites(
     rent: web3.SYSVAR_RENT_PUBKEY,
   };
 
-  const remainingAccounts = Array.from({ length: numInvites }, (_, index) => {
-    const indexBuffer = Buffer.alloc(4);
-    indexBuffer.writeUInt32LE(index);
+  // ⚠️ Each invite needs a unique 6-character ID
+  const remainingAccounts = Array.from({ length: numInvites }, () => {
+    const idStr = nanoid(6); // e.g., "a1B2cD"
+    const idBytes = Buffer.from(idStr, 'utf8'); // 6 bytes
+    if (idBytes.length !== 6) throw new Error('Invite ID must be 6 bytes');
+
     const [pubkey, bump] = PublicKey.findProgramAddressSync(
-      [Buffer.from('invite'), eventPK.toBuffer(), indexBuffer],
+      [Buffer.from('invite'), eventPK.toBuffer(), idBytes],
       program.programId
     );
 
     return {
-      id: index,
+      idStr,
+      id: stringToNumberArray(idStr), // [u8; 6]
       pubkey,
       bump,
     };
   });
-
-  const r = {};
 
   const inviteKeys = remainingAccounts.map(({ id, bump }) => ({ id, bump }));
   const invitePubkeys = remainingAccounts.map(({ pubkey }) => ({
@@ -45,17 +54,29 @@ export async function createInvites(
     isSigner: false,
     isWritable: true,
   }));
-  const { pubkeys } = await program.methods
-    .createInvites(inviteKeys)
-    .accounts(accounts)
-    .remainingAccounts(invitePubkeys)
-    .signers([r])
-    .rpcAndKeys(confirmOptions);
+
+  const tx = program.methods.createInvites(inviteKeys).accounts(accounts).remainingAccounts(invitePubkeys);
+  const { pubkeys } = await tx.rpcAndKeys(confirmOptions);
+
+  console.info(`Successfully created ${numInvites} invites for event: ${eventPK.toBase58()}`);
+
+  // const { pubkeys } = await program.methods
+  //   .createInvites(inviteKeys)
+  //   .accounts(accounts)
+  //   .remainingAccounts(invitePubkeys)
+  //   .signers([r])
+  //   .rpcAndKeys(confirmOptions);
 
   console.info(`Successfully created event: ${eventPK}`);
 
   return {
     pubkeys,
+    inviteKeys: remainingAccounts.map(({ idStr, id, bump, pubkey }) => ({
+      idStr,
+      id,
+      bump,
+      pubkey,
+    })),
   };
 }
 

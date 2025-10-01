@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es2022",
+    "target": "es2024",
     "module": "esnext",
     "rootDir": ".",
     "baseUrl": ".",
@@ -19,7 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "noPropertyAccessFromIndexSignature": false,
-    "lib": ["es2020", "dom"],
+    "lib": ["esnext", "dom"],
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true

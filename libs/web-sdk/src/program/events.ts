@@ -3,8 +3,17 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import BN from 'bn.js';
 
 import { generateEventID, stringToNumberArray } from '../utils';
-import { CreateEventMetadata, EventLinkProgram, EventSettings, EventStatus } from './types';
-import { SystemProgram } from '@solana/web3.js';
+import {
+  type CreateEventMetadata,
+  type Event,
+  type EventLinkProgram,
+  type EventSettings,
+  type EventStatus,
+} from './types';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+
+export const DISCRIMINATOR_LENGTH = 8;
+export const i64_LENGTH = 8;
 
 export async function createEvent(
   program: EventLinkProgram,
@@ -32,10 +41,8 @@ export async function createEvent(
     status: { [metadata.status]: {} } as unknown as EventStatus,
   };
 
-  const rr = stringToNumberArray(generateEventID(), 9);
-  return await program.methods
-    // .createEvent(stringToNumberArray(args.id, 9), args.metadata, args.settings, args.initialFunds)
-    .createEvent(rr, metadataArg, settings, initialFunds)
+  return program.methods
+    .createEvent(stringToNumberArray(generateEventID(), 9), metadataArg, settings, initialFunds)
     .accounts(accounts)
     .rpcAndKeys();
 }
@@ -44,6 +51,33 @@ export async function updateEvent() {
   // @TODO
 }
 
-export async function getEvents() {
-  // @TODO
+export async function getEvents(
+  program: EventLinkProgram,
+  creator: PublicKey
+): Promise<[PublicKey, Event][]> {
+  const programAccounts = await program.account.event.all([
+    {
+      memcmp: {
+        offset: DISCRIMINATOR_LENGTH + i64_LENGTH + i64_LENGTH,
+        bytes: creator.toBase58(),
+      },
+    },
+  ]);
+
+  return programAccounts.map((a) => {
+    console.log('!!! fetched publicKey', a.publicKey?.toBase58());
+    return [a.publicKey, a.account];
+  });
+}
+
+export async function getEventInfo(program: EventLinkProgram, eventPubkey: PublicKey) {
+  console.log('!!! getting infor for publicKey', eventPubkey.toBase58());
+  const pda = generateEventInfoPda(program.programId, eventPubkey);
+  return program.account.eventInfo.fetch(pda);
+}
+
+export function generateEventInfoPda(programId: PublicKey, eventPubkey: PublicKey) {
+  const [pda] = PublicKey.findProgramAddressSync([Buffer.from('info'), eventPubkey.toBuffer()], programId);
+  console.log('!!!!! PDA', pda.toBase58());
+  return pda;
 }

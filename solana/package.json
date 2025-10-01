@@ -3,17 +3,17 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "@coral-xyz/anchor": "^0.31.0",
-    "@solana/spl-token": "^0.4.8",
-    "@solana/web3.js": "^1.95.3",
-    "bn.js": "^5.2.1",
-    "nanoid": "^5.0.7"
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.4",
+    "bn.js": "^5.2.2",
+    "nanoid": "^5.1.5"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "@gxxc/nx-anchor": "^0.0.8",
     "@types/bn.js": "^5.1.5",
-    "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4"
   }
 }

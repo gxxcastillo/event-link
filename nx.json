@@ -1,4 +1,7 @@
 {
+  "tui": {
+    "autoExit": 1
+  },
   "pluginsConfig": {
     "@nx/js": {
       "analyzeSourceFiles": true
